@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using PetStore.Api.Orchestrators;
 using PetStore.Dto.Models;
 using PetStore.Dto.Requests;
 
@@ -10,16 +11,23 @@ namespace PetStore.Api.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        [HttpPost]
-        public async Task<int> SubmitOrder([FromBody] OrderRequest request)
+        private readonly IOrderOrchestrator _orderOrchestrator;
+
+        public OrdersController(IOrderOrchestrator orderOrchestrator)
         {
-            return 1;
+            _orderOrchestrator = orderOrchestrator;
+        }
+
+        [HttpPost]
+        public async Task<OrderSummary> SubmitOrder([FromBody] OrderRequest request)
+        {
+            return await _orderOrchestrator.PostOrder(request);
         }
 
         [HttpGet("Summary")]
         public List<OrderSummary> GetOrderSummaries([FromQuery] OrderSummaryRequest request)
         {
-            return null;
+            return _orderOrchestrator.GetOrderSummary(request.CustomerId);
         }
     }
 }

@@ -18,7 +18,13 @@ namespace PetStore.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureSwagger();
+            services
+                .ConfigureSwagger()
+                .ConfigureSettings(Configuration)
+                .ConfigureLiteDb(Configuration)
+                .ConfigureHttpClients();
+
+            services.AddScopedInjectables();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
