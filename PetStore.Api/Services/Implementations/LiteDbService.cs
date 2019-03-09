@@ -47,5 +47,17 @@ namespace PetStore.Api.Services.Implementations
                 return result?.ToList();
             }
         }
+
+        public T Get<T>(Func<LiteCollection<T>, T> handler) where T : new()
+        {
+            using (var db = new LiteDatabase(_dbPath))
+            {
+                var dbCollection = db.GetCollection<T>(typeof(T).Name);
+
+                var result = handler(dbCollection);
+
+                return result;
+            }
+        }
     }
 }

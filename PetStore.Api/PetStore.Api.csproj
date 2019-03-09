@@ -5,15 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="db\**" />
     <Compile Remove="wwwroot\**" />
+    <Content Remove="db\**" />
     <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="db\**" />
     <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="db\**" />
     <None Remove="wwwroot\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="2.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using PetStore.Api.Exceptions;
 using PetStore.Api.Settings;
 
 namespace PetStore.Api.Services.Implementations
@@ -24,41 +26,38 @@ namespace PetStore.Api.Services.Implementations
             _httpClient = httpClient;
         }
 
-        public async Task<T> GetInventory<T>(string url) =>
-            await GetData<T>(url);
+        public async Task<T> GetInventory<T>(string route, Action<int> errorHandler = null) =>
+            await GetData<T>(route, errorHandler);
 
-        private async Task<T> GetData<T>(string url)
+        private async Task<T> GetData<T>(string route, Action<int> errorHandler)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            var request = new HttpRequestMessage(HttpMethod.Get, route);
 
-            try
+            var response = await _httpClient.SendAsync(request);
+
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            var jObject = JObject.Parse(content);
+
+            if (!jObject.TryGetValue("statusCode", out var statusCode) ||
+                (int)statusCode != 200)
             {
-                var response = await _httpClient.SendAsync(request);
+                var responseCode = (int)statusCode;
 
-                response.EnsureSuccessStatusCode();
-
-                var content = await response.Content.ReadAsStringAsync();
-
-                var jObject = JObject.Parse(content);
-
-                if (!jObject.TryGetValue("statusCode", out var statusCode) ||
-                    (int)statusCode != 200)
-                {
-                    // throw exception here..
-                }
-
-                if (jObject.TryGetValue("body", out var body))
-                {
-                    return body.ToObject<T>();
-                }
-            }
-            catch (Exception e)
-            {
-                // Handle exception here...
-                throw;
+                errorHandler?.Invoke(responseCode);
             }
 
-            throw new ApplicationException();
+            if (jObject.TryGetValue("body", out var body))
+            {
+                return body.ToObject<T>();
+            }
+            else
+            {
+                throw new CustomHttpException(HttpStatusCode.InternalServerError, 
+                    "Failed to parse Inventory API response.");
+            }
         }
     }
 }

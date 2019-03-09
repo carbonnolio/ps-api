@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetStore.Api.Configuration.Extensions;
+using PetStore.Api.Middleware;
 
 namespace PetStore.Api
 {
@@ -22,7 +23,8 @@ namespace PetStore.Api
                 .ConfigureSwagger()
                 .ConfigureSettings(Configuration)
                 .ConfigureLiteDb(Configuration)
-                .ConfigureHttpClients();
+                .ConfigureHttpClients()
+                .ConfigureVersioning();
 
             services.AddScopedInjectables();
 
@@ -31,16 +33,15 @@ namespace PetStore.Api
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
+            if (!env.IsDevelopment())
             {
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
+
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
+
             app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUI(c => 

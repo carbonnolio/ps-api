@@ -9,5 +9,6 @@ namespace PetStore.Api.Orchestrators
     {
         Task<OrderSummary> PostOrder(OrderRequest order);
         List<OrderSummary> GetOrderSummary(string customerId);
+        OrderSummary GetOrderSummary(int id);
     }
 }

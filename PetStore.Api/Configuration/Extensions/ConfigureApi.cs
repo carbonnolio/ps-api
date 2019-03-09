@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetStore.Api.Services;
@@ -12,8 +13,9 @@ namespace PetStore.Api.Configuration.Extensions
 {
     public static class ConfigureApi
     {
-        public static IServiceCollection ConfigureSwagger(this IServiceCollection services) =>
-            services.AddSwaggerGen(c => 
+        public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1.0", new Info
                 {
@@ -22,6 +24,9 @@ namespace PetStore.Api.Configuration.Extensions
                     Description = "Pet Store API"
                 });
             });
+
+            return services;
+        }
 
         public static IServiceCollection ConfigureSettings(this IServiceCollection services, IConfiguration configuration)
         {
@@ -65,6 +70,18 @@ namespace PetStore.Api.Configuration.Extensions
         public static IServiceCollection ConfigureHttpClients(this IServiceCollection services)
         {
             services.AddHttpClient<IInventoryClient, InventoryClient>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(options => 
+            {
+                options.ReportApiVersions = true;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+            });
 
             return services;
         }
