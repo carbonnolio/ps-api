@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using PetStore.Api.Orchestrators.Implementations;
@@ -25,7 +26,8 @@ namespace PetStore.Api.Tests.Orchestrators
         {
             var orderRequest = StaticObjects.OrderRequestItems2;
 
-            _inventoryClient.GetInventory<InventoryItem>(Arg.Is<string>(x => x.Contains("8ed0e6f7")))
+            _inventoryClient.GetInventory<InventoryItem>(Arg.Is<string>(x => x.Contains("8ed0e6f7")),
+                Arg.Any<Action<int>>())
                 .Returns(new InventoryItem
                 {
                     Id = "8ed0e6f7",
@@ -33,7 +35,8 @@ namespace PetStore.Api.Tests.Orchestrators
                     Price = 9.99m
                 });
 
-            _inventoryClient.GetInventory<InventoryItem>(Arg.Is<string>(x => x.Contains("c0258525")))
+            _inventoryClient.GetInventory<InventoryItem>(Arg.Is<string>(x => x.Contains("c0258525")), 
+                Arg.Any<Action<int>>())
                 .Returns(new InventoryItem
                 {
                     Id = "c0258525",
